@@ -36,6 +36,16 @@ describe "Jail" do
     end
   end
 
+  describe ".parameters" do
+    it "returns an array of known jail parameters" do
+      params = Jail.parameters
+      expect(params).must_be_instance_of Array
+      expect(params.include?("jid")).must_equal true
+      expect(params.include?("name")).must_equal true
+      expect(params.include?("path")).must_equal true
+    end
+  end
+
   describe ".set" do
     let(:jid) { Jail.set({"path" => root, "persist" => 1}, Jail::CREATE) }
     after { Jail.remove(jid) if jid }

@@ -280,6 +280,26 @@ mrb_jail_constants(mrb_state *mrb, mrb_value self)
   return flags;
 }
 
+static mrb_value
+mrb_jail_parameters(mrb_state *mrb, mrb_value self)
+{
+  struct jailparam *params = NULL;
+  int count;
+  int i;
+  mrb_value ary;
+
+  (void)self;
+  count = jailparam_all(&params);
+  if (count == -1) mrb_sys_fail(mrb, "jailparam_all");
+  ary = mrb_ary_new_capa(mrb, count);
+  for (i = 0; i < count; i++) {
+    mrb_ary_push(mrb, ary, mrb_str_new_cstr(mrb, params[i].jp_name));
+  }
+  jailparam_free(params, (unsigned)count);
+  free(params);
+  return ary;
+}
+
 void
 mrb_mruby_jail_gem_init(mrb_state *mrb)
 {
@@ -291,6 +311,7 @@ mrb_mruby_jail_gem_init(mrb_state *mrb)
   mrb_define_class_method(mrb, jail_cls, "attach", mrb_jail_attach, MRB_ARGS_REQ(1));
   mrb_define_class_method(mrb, jail_cls, "remove", mrb_jail_remove, MRB_ARGS_REQ(1));
   mrb_define_class_method(mrb, jail_cls, "flags", mrb_jail_constants, MRB_ARGS_NONE());
+  mrb_define_class_method(mrb, jail_cls, "parameters", mrb_jail_parameters, MRB_ARGS_NONE());
   mrb_define_const(mrb, jail_cls, "CREATE", mrb_fixnum_value(MRB_JAIL_CREATE));
   mrb_define_const(mrb, jail_cls, "UPDATE", mrb_fixnum_value(MRB_JAIL_UPDATE));
   mrb_define_const(mrb, jail_cls, "ATTACH", mrb_fixnum_value(MRB_JAIL_ATTACH));

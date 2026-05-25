@@ -82,6 +82,10 @@ class Jail
     all.map(&:name)
   end
 
+  # @!method self.parameters
+  #   Returns all known jail parameter names from `libjail`.
+  #   @return [Array<String>]
+
   ##
   # Returns a new jail wrapper.
   # @param [Integer, nil] jid The jail ID selector
@@ -203,6 +207,20 @@ class Jail
   def inspect
     "#<Jail jid=#{jid} name=#{name.inspect}>"
   end
+
+  ##
+  # Returns all known jail parameters, and their values
+  # @return [Hash]
+  def to_h
+    Jail.parameters.map do |key|
+      [key, self[key]]
+    rescue Errno::EINVAL
+      # HardenedBSD bug:
+      # cannot get or set hardening.* params
+      [key, ""]
+    end.to_h
+  end
+  alias_method :parameters, :to_h
 
   private
 

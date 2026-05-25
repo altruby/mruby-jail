@@ -39,6 +39,21 @@ jail.attach
 puts eval("1 + 1")
 ```
 
+#### All known parameters
+
+```ruby
+##
+# All known jail parameters, by name
+Jail.parameters.each do |parameter|
+  puts parameter
+end
+
+##
+# All known jail parameters, and their values, for a given jail
+jail = Jail.find_by_id(1)
+p jail.parameters # => Hash
+```
+
 #### Read parameters
 
 ```ruby
@@ -116,9 +131,6 @@ Attaches the current process to the jail.
 
 **`jail.remove`** <br>
 Removes the jail from the system.
-
-Parameter names use FreeBSD jail names such as `"name"`,
-`"path"`, `"host.hostname"`, and `"persist"`.
 
 ## Integration
 
