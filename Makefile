@@ -12,10 +12,10 @@ MRUBY_DIR    ?= ../mruby
 BUILD_CONFIG  = build.rb
 BUILD_NAME    = mruby-jail
 BUILD_DIR     = $(MRUBY_DIR)/build/$(BUILD_NAME)
-BUILD_PROFILE ?= test
+BUILD ?= test
 
 TOOLCHAIN_BIN  = bin/mruby bin/mrbc bin/mruby-config
-TOOLCHAIN_STAMP = tmp/toolchain.$(BUILD_PROFILE).stamp
+TOOLCHAIN_STAMP = tmp/toolchain.$(BUILD).stamp
 
 .PHONY: all test toolchain clean distclean
 
@@ -29,7 +29,7 @@ toolchain: $(TOOLCHAIN_STAMP)
 $(TOOLCHAIN_STAMP): $(BUILD_CONFIG) mrbgem.rake $(shell find mrblib spec src -type f 2>/dev/null | sort)
 	mkdir -p tmp bin
 	ruby -C $(MRUBY_DIR) minirake clean 2>/dev/null || true
-	BUILD_PROFILE=$(BUILD_PROFILE) ruby -C $(MRUBY_DIR) minirake MRUBY_CONFIG=$$(pwd)/$(BUILD_CONFIG)
+	BUILD=$(BUILD) ruby -C $(MRUBY_DIR) minirake MRUBY_CONFIG=$$(pwd)/$(BUILD_CONFIG)
 	cp -r $(BUILD_DIR)/bin/* bin/
 	touch $(TOOLCHAIN_STAMP)
 
