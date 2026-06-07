@@ -10,6 +10,43 @@
 #   puts jail["name"]
 #   jail.remove
 class Jail
+  extend Enumerable
+  def self.each(...)
+    all.each(...)
+  end
+
+  ##
+  # Returns all known jails
+  # @return [Array<Jail>]
+  def self.all
+    jails, lastjid = [], 0
+    loop do
+      cursor  = get({"jid" => 0, "lastjid" => lastjid}, 0)
+      lastjid = cursor["jid"]
+      break jails unless lastjid and lastjid != 0
+      jails << find_by(jid: lastjid)
+    rescue Errno::ENOENT
+      break jails
+    end
+  end
+
+  ##
+  # Find a jail.
+  # @param [Integer] jid The jail ID
+  # @param [String] name The jail name
+  # @return [Jail]
+  def self.find_by(jid: nil, name: nil)
+    if jid and name
+      raise ArgumentError, "provide a jid or name, not both"
+    elsif jid
+      new(jid:)
+    elsif name
+      find { _1.name == name }
+    else
+      raise ArgumentError, "provide a jid or name"
+    end
+  end
+
   ##
   # Creates a jail and returns a {Jail} instance for it.
   # @param [String] path The jail root path
@@ -28,58 +65,7 @@ class Jail
     raw["host.hostname"] = hostname if hostname
     raw["persist"] = persist ? 1 : 0
     jid = set(raw, CREATE)
-    new(jid: jid, name: name)
-  end
-
-  ##
-  # Returns a {Jail} instance for an existing jail by JID.
-  # @param [Integer] jid The jail ID
-  # @return [Jail]
-  def self.find_by_id(jid)
-    new(jid:)
-  end
-
-  ##
-  # Finds a jail by name and returns a {Jail} instance for it.
-  # @param [String] name The jail name
-  # @return [Jail]
-  def self.find_by_name(name)
-    jail = all.find { _1["name"] == name }
-    raise Errno::ENOENT, "jail_get" unless jail
-    jail
-  end
-
-  ##
-  # Returns the JIDs of all running jails.
-  # @return [Array<Integer>]
-  def self.all_by_id
-    jids = []
-    last = 0
-    loop do
-      begin
-        result = get({"jid" => 0, "lastjid" => last}, 0)
-        last = result["jid"]
-        break unless last && last != 0
-        jids << last
-      rescue Errno::ENOENT
-        break
-      end
-    end
-    jids
-  end
-
-  ##
-  # Returns all running jails as {Jail} instances.
-  # @return [Array<Jail>]
-  def self.all
-    all_by_id.map { find_by_id(_1) }
-  end
-
-  ##
-  # Returns the names of all running jails.
-  # @return [Array<String, nil>]
-  def self.all_by_name
-    all.map(&:name)
+    new(jid:, name:)
   end
 
   # @!method self.parameters

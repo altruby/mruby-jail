@@ -128,27 +128,26 @@ describe "Jail" do
     end
   end
 
-  describe ".find_by_id" do
+  describe ".find_by" do
     let(:jname) { Jail::Test.jname("mruby-find-test") }
-    let(:created) { Jail.create(path: root, name: jname) }
-
-    it "finds a jail by its JID" do
-      found = Jail.find_by_id(created.id)
-      expect(found).must_be_instance_of Jail
-      expect(found.id).must_equal created.id
-      expect(found.name).must_equal jname
-    end
-  end
-
-  describe ".find_by_name" do
-    let(:jname) { Jail::Test.jname("mruby-find-name-test") }
     let(:created) { Jail.create(path: root, name: jname) }
     before { created }
 
-    it "finds a jail by its name" do
-      found = Jail.find_by_name(jname)
-      expect(found).must_be_instance_of Jail
-      expect(found.name).must_equal jname
+    context "when given an id" do 
+      it "finds a jail" do
+        found = Jail.find_by(jid: created.id)
+        expect(found).must_be_instance_of Jail
+        expect(found.id).must_equal created.id
+        expect(found.name).must_equal jname
+      end
+    end
+
+    context "when given a name" do 
+      it "finds a jail by its name" do
+        found = Jail.find_by(name: jname)
+        expect(found).must_be_instance_of Jail
+        expect(found.name).must_equal jname
+      end
     end
   end
 
@@ -179,20 +178,6 @@ describe "Jail" do
     it "returns a human-readable representation" do
       expect(str).must_include "Jail"
       expect(str).must_include jname
-    end
-  end
-
-  describe ".all_by_id" do
-    it "returns an array of JIDs" do
-      jids = Jail.all_by_id
-      expect(jids).must_be_instance_of Array
-    end
-  end
-
-  describe ".all_by_name" do
-    it "returns an array of names" do
-      names = Jail.all_by_name
-      expect(names).must_be_instance_of Array
     end
   end
 end

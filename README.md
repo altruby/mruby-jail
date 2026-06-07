@@ -25,22 +25,80 @@ but exposed through mruby.
 
 ## Quick start
 
-#### Create
+#### Jail
 
-Creates a new jail with a name, hostname, and path.
-Other parameters can also be provided, and some parameters
-have to be provided at creation time (such as `vnet` =>
-`"new"`):
+The Jail singleton class is enumerable. It provides access
+to all running jails that are visible to the current process.
+We can use the `each` method to iterate over jails, we can
+use the `select` method to filter, we can use the `find`
+method to find a jail, and we can use the `map` method to
+transform:
+
+```ruby
+##
+# Iterate all
+Jail.each do |jail|
+  print "jid=#{jail.jid}",
+        "name=#{jail.name}",
+        "hostname=#{jail.hostname}",
+        "\n\n"
+end
+
+##
+# Select jails by hostname
+Jail.select do |jail|
+  jail.hostname.to_s.end_with?(".local")
+end
+
+##
+# Find a jail by name
+example = Jail.find do |jail|
+  jail.name == "example"
+end
+
+##
+# Transform jails
+jids = Jail.map(&:jid)
+```
+
+#### Jail.create
+
+The `Jail.create` method creates a new jail and returns a
+`Jail` instance for it. A path is required. A name, hostname,
+and other jail parameters can also be provided. Some parameters
+have to be provided at creation time, such as `vnet: "new"`:
 
 ```ruby
 jail = Jail.create(
+  path: "/tmp/jail",
   name: "example",
   hostname: "example.local",
-  path: "/tmp/jail"
+  vnet: "new"
 )
 ```
 
-#### Parameters: all
+#### Jail.find_by
+
+The `Jail.find_by` method can find a jail by ID or by name,
+and returns a `Jail` instance:
+
+```ruby
+##
+# Find by JID
+jail = Jail.find_by(jid: 1)
+print "jid " , "\t", jail.jid      , "\n"
+print "name ", "\t", jail.name     , "\n"
+print "host ", "\t", jail.hostname , "\n"
+print "path ", "\t", jail.path     , "\n"
+
+##
+# Find by name
+jail = Jail.find_by(name: "example")
+print "jid " , "\t", jail.jid      , "\n"
+print "name ", "\t", jail.name     , "\n"
+```
+
+#### Jail.parameters
 
 Discover which jail parameters are supported by the system
 and inspect the current values for a specific jail.
@@ -57,82 +115,66 @@ end
 
 ##
 # All known jail parameters, and their values, for a given jail
-jail = Jail.find_by_id(1)
+jail = Jail.find_by(jid: 1)
 p jail.parameters # => Hash
 ```
 
-#### Parameters: get
+#### Jail#[]
 
-Read the name, hostname, and path of an existing jail
-through generated accessor methods that map to common
-jail parameters:
+Read jail parameters with the hash-style interface. There are
+also convenience methods for common parameters such as `jid`,
+`name`, `hostname`, and `path`:
 
 ```ruby
-jail = Jail.find_by_id(1)
+jail = Jail.find_by(jid: 1)
+print "jid " , "\t", jail["jid"]           , "\n"
+print "name ", "\t", jail["name"]          , "\n"
+print "host ", "\t", jail["host.hostname"] , "\n"
+print "path ", "\t", jail["path"]          , "\n"
+
+##
+# Convenience readers
+print "jid " , "\t", jail.jid      , "\n"
+print "name ", "\t", jail.name     , "\n"
+print "host ", "\t", jail.hostname , "\n"
+print "path ", "\t", jail.path     , "\n"
+```
+
+#### Jail#[]=
+
+Update jail parameters through the hash-style interface. There
+are also convenience setters for common parameters such as
+`name`, `hostname`, and `path`:
+
+```ruby
+jail = Jail.find_by(jid: 1)
+jail["host.hostname"] = "example.local"
 puts jail.name
 puts jail.hostname
 puts jail.path
-```
 
-#### Parameters: set
-
-Update jail parameters through generated setters and a
-hash-style interface. The generated setters cover common
-properties, while the hash-style interface supports any
-parameter exposed by
-[`libjail`](https://man.freebsd.org/cgi/man.cgi?query=jail&apropos=0&sektion=3):
-
-```ruby
 ##
-# Preconfigured setters
-jail = Jail.find_by_id(1)
+# Convenience writer
 jail.hostname = "example.local"
-
-##
-# Dynamic jail parameters
-jail = Jail.find_by_id(1)
-jail["host.hostname"] = "example.local"
 ```
 
-#### All
-
-Iterate over all running jails with `Jail.all`. Each
-element in the collection is a Jail object with its ID
-and readable properties:
-
-```ruby
-Jail.all.each do |jail|
-  puts "JID=#{jail.id} name=#{jail.name}"
-end
-```
-
-#### Find
-
-Find a jail by ID or by name. Both methods return a Jail
-instance that can be used for further operations:
-
-```ruby
-by_id = Jail.find_by_id(1)
-by_name = Jail.find_by_name("example")
-```
-
-#### Attach
+#### Jail#attach
 
 Attach the current process to a jail. After attaching,
 the process runs within the jail's environment:
 
 ```ruby
-jail = Jail.find_by_id(1)
+jail = Jail.find_by(name: "example")
 jail.attach
 ```
 
-#### Remove
+#### Jail#remove
 
 Remove a jail from the system. This is a destructive
 operation that kills all processes in the jail:
 
 ```ruby
-jail = Jail.find_by_name("example")
+jail = Jail.find_by(name: "example")
 jail.remove
 ```
 
