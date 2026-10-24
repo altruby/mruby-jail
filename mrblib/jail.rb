@@ -1,14 +1,15 @@
 ##
-# The {Jail} class provides a compact Ruby interface to FreeBSD jails.
-# It wraps the native `libjail` binding with a small object API for
-# creating, finding, querying, updating, attaching, and removing jails.
+# The {Jail} class provides mruby
+# with an interface around libjail(3).
 #
 # @example
-#   jail = Jail.create(path: "/tmp/jail", name: "example",
-#                      hostname: "example.local", persist: true)
-#   jail["host.hostname"] = "example.local"
-#   puts jail["name"]
-#   jail.remove
+#   jail = Jail.create(
+#     name: "example",
+#     path: "/tmp/jail",
+#     hostname: "example.local",
+#     persist: true
+#   )
+#   jail.attach
 class Jail
   extend Enumerable
   def self.each(...)
@@ -213,7 +214,7 @@ class Jail
   def selector
     selector = {}
     selector["jid"] = @jid if @jid
-    selector["name"] = @name if !@jid && @name
+    selector["name"] = @name if !@jid and @name
     if selector.empty?
       raise ArgumentError, "jail selector requires jid or name"
     end
