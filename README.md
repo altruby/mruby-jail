@@ -184,7 +184,7 @@ jail.remove
 MRuby::Build.new("app") do |conf|
   conf.toolchain
   conf.gembox "default"
-  conf.gem github: "0x1eef/mruby-jail", branch: "main"
+  conf.gem github: "altruby/mruby-jail", branch: "main"
 end
 ```
 
