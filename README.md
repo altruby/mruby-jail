@@ -1,14 +1,14 @@
 <p align="center">
-  <a href="http://git.home.network/0x1eef/mruby-jail">
+  <a href="http://git.home.network/altruby/mruby-jail">
     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi39c9ab6rTHulzqrvy45M_omMN8cUyRxfaAph0UhlpubhMxgnJVyOEarYGmHNZgt1uUZmO8cobmrloSiAfxUjgjNOVvRZrF9n9b5tO0S-sG7e9DHfalqyYQZm6aY1jV55IzPbGPA/s1600/freebsd_jail.png" width="200" height="200" border="0" alt="mruby-jail">
   </a>
 </p>
 <p align="center">
-  <a href="http://git.home.network/0x1eef/mruby-jail">
+  <a href="http://git.home.network/altruby/mruby-jail">
     <img src="https://img.shields.io/badge/FreeBSD-Jails-blue.svg" alt="FreeBSD Jails">
   </a>
-  <a href="https://opensource.org/license/0bsd">
-    <img src="https://img.shields.io/badge/License-0BSD-orange.svg" alt="License">
+  <a href="https://opensource.org/license/mit">
+    <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
   </a>
 </p>
 
@@ -190,6 +190,6 @@ end
 
 ## License
 
-[BSD Zero Clause](https://choosealicense.com/licenses/0bsd/)
+[MIT License](https://choosealicense.com/licenses/mit/)
 <br>
 See [LICENSE](./LICENSE)
