@@ -24,21 +24,15 @@ jobs:
         repository: mruby/mruby
         path: mruby
         ##
-        # The full history is needed to check out the commit that
-        # build.rb.lock is pinned to
+        # The full history is needed when build.rb.lock pins mruby to a
+        # commit that is not the tip of the default branch
         fetch-depth: 0
-
-    - name: read the locked mruby commit
-      run: |
-        commit=$(sed -n 's/^  git_commit: //p' mruby-jail/build.rb.lock)
-        echo "mruby commit: $commit"
-        echo "MRUBY_COMMIT=$commit" >> "$GITHUB_ENV"
 
     - name: Build and test
       uses: vmactions/freebsd-vm@v1
       with:
         copyback: false
-        envs: GITHUB_WORKSPACE,MRUBY_COMMIT
+        envs: GITHUB_WORKSPACE
         run: |
           set -e
 
@@ -58,6 +52,18 @@ jobs:
           ruby -v
           git --version
 
-          git -C "$GITHUB_WORKSPACE/mruby" checkout --detach "$MRUBY_COMMIT"
+          ##
+          # Pin mruby to the commit recorded by build.rb.lock, when that
+          # file is available. It is a generated file, and it is ignored
+          # by .gitignore, so it is usually absent
+          lock="$GITHUB_WORKSPACE/mruby-jail/build.rb.lock"
+          if [ -f "$lock" ]; then
+            commit=$(sed -n 's/^  git_commit: //p' "$lock")
+            echo "mruby commit: $commit"
+            git -C "$GITHUB_WORKSPACE/mruby" checkout --detach "$commit"
+          else
+            echo "build.rb.lock is not available; using mruby's default branch"
+          fi
+
           cd "$GITHUB_WORKSPACE/mruby-jail"
           make MRUBY_DIR="$GITHUB_WORKSPACE/mruby"
