@@ -37,9 +37,11 @@ jobs:
           set -e
 
           ##
-          # Install what the base system does not already provide
+          # Install what the base system does not already provide.
+          # mruby's minirake is a thin wrapper around rake
           command -v git >/dev/null 2>&1 || pkg-static install -y git
           command -v ruby >/dev/null 2>&1 || pkg-static install -y ruby
+          command -v rake >/dev/null 2>&1 || pkg-static install -y rubygem-rake
 
           ##
           # The workspace is owned by the runner user, but the commands
