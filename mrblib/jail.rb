@@ -58,9 +58,7 @@ class Jail
   # @return [Jail]
   def self.create(path:, name: nil, hostname: nil, persist: true, **params)
     raw = {}
-    params.each do |key, value|
-      raw[key.to_s] = value
-    end
+    params.each { raw[_1.to_s] = _2 }
     raw["path"] = path
     raw["name"] = name if name
     raw["host.hostname"] = hostname if hostname
