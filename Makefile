@@ -17,6 +17,12 @@ BUILD ?= test
 TOOLCHAIN_BIN  = bin/mruby bin/mrbc bin/mruby-config
 TOOLCHAIN_STAMP = tmp/toolchain.$(BUILD).stamp
 
+##
+# Sources that require the toolchain to be rebuilt. The `!=` assignment
+# runs the command at read time and is understood by both bmake and
+# GNU make (>= 4.0)
+SOURCES != find mrblib spec src -type f 2>/dev/null | sort
+
 .PHONY: all test toolchain clean distclean
 
 all: toolchain test
@@ -26,7 +32,7 @@ test: toolchain
 
 toolchain: $(TOOLCHAIN_STAMP)
 
-$(TOOLCHAIN_STAMP): $(BUILD_CONFIG) mrbgem.rake $(shell find mrblib spec src -type f 2>/dev/null | sort)
+$(TOOLCHAIN_STAMP): $(BUILD_CONFIG) mrbgem.rake $(SOURCES)
 	mkdir -p tmp bin
 	ruby -C $(MRUBY_DIR) minirake clean 2>/dev/null || true
 	BUILD=$(BUILD) ruby -C $(MRUBY_DIR) minirake MRUBY_CONFIG=$$(pwd)/$(BUILD_CONFIG)
