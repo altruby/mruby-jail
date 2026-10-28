@@ -167,7 +167,7 @@ class JailAttachTest < Test
   def test_attach_raises_for_an_unknown_jail
     jid = Jail.set({"path" => path, "persist" => 1}, Jail::CREATE)
     Jail.remove(jid)
-    assert_raise(Errno::ENOENT) { Jail.attach(jid) }
+    assert_raise(Errno::EINVAL) { Jail.attach(jid) }
   end
 end
 
@@ -175,7 +175,7 @@ class JailRemoveTest < Test
   def test_remove
     jid = Jail.set({"path" => path, "persist" => 1}, Jail::CREATE)
     Jail.remove(jid)
-    assert_raise(Errno::EINVAL) { Jail.get({"jid" => jid, "name" => nil}, 0) }
+    assert_raise(Errno::ENOENT) { Jail.get({"jid" => jid, "name" => nil}, 0) }
   end
 end
 
