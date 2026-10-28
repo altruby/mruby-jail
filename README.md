@@ -60,7 +60,7 @@ end
 
 ## Quick start
 
-#### Jail
+##### Jail
 
 The Jail singleton class is enumerable. It provides access
 to all running jails that are visible to the current process.
@@ -96,7 +96,7 @@ end
 jids = Jail.map(&:jid)
 ```
 
-#### Jail.create
+##### Jail.create
 
 The `Jail.create` method creates a new jail and returns a
 `Jail` instance for it. A path is required. A name, hostname,
@@ -112,7 +112,7 @@ jail = Jail.create(
 )
 ```
 
-#### Jail.find_by
+##### Jail.find_by
 
 The `Jail.find_by` method can find a jail by ID or by name,
 and returns a `Jail` instance:
@@ -133,7 +133,7 @@ print "jid " , "\t", jail.jid      , "\n"
 print "name ", "\t", jail.name     , "\n"
 ```
 
-#### Jail.parameters
+##### Jail.parameters
 
 Discover which jail parameters are supported by the system
 and inspect the current values for a specific jail.
@@ -154,7 +154,7 @@ jail = Jail.find_by(jid: 1)
 p jail.parameters # => Hash
 ```
 
-#### Jail#[]
+##### Jail#[]
 
 Read jail parameters with the hash-style interface. There are
 also convenience methods for common parameters such as `jid`,
@@ -175,7 +175,7 @@ print "host ", "\t", jail.hostname , "\n"
 print "path ", "\t", jail.path     , "\n"
 ```
 
-#### Jail#[]=
+##### Jail#[]=
 
 Update jail parameters through the hash-style interface. There
 are also convenience setters for common parameters such as
@@ -193,7 +193,7 @@ puts jail.path
 jail.hostname = "example.local"
 ```
 
-#### Jail#attach
+##### Jail#attach
 
 Attach the current process to a jail. After attaching,
 the process runs within the jail's environment:
@@ -203,7 +203,7 @@ jail = Jail.find_by(name: "example")
 jail.attach
 ```
 
-#### Jail#remove
+##### Jail#remove
 
 Remove a jail from the system. This is a destructive
 operation that kills all processes in the jail:
