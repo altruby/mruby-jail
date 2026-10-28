@@ -1,0 +1,65 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PICORUBY_REPO: https://github.com/picoruby/picoruby.git
+  PICORUBY_REF: bcce62cb3bc04818d9a511cc67b663c4e6e5c867
+
+jobs:
+  specs:
+    name: specs
+    runs-on: freebsd
+    timeout-minutes: 30
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+        with:
+          path: picoruby-jail
+
+      - name: install build dependencies
+        run: |
+          command -v git >/dev/null 2>&1 || pkg install -y git
+          command -v ruby >/dev/null 2>&1 || pkg install -y ruby
+          command -v rake >/dev/null 2>&1 || pkg install -y rubygem-rake
+
+      - name: show versions
+        run: |
+          uname -a
+          id
+          ruby -v
+          git --version
+          cc --version | head -1
+
+      - name: clone picoruby
+        run: |
+          git clone "$PICORUBY_REPO" picoruby
+          git -C picoruby checkout --detach "$PICORUBY_REF"
+          git -C picoruby submodule update --init --depth 1
+
+      - name: build
+        working-directory: picoruby-jail
+        run: make build
+
+      - name: smoke test
+        working-directory: picoruby-jail
+        run: |
+          ../picoruby/build/picoruby-jail/bin/picoruby -e 'p Jail::VERSION'
+          ../picoruby/build/picoruby-jail/bin/picoruby -e 'p Jail.parameters.size'
+
+      - name: run tests
+        working-directory: picoruby-jail
+        run: |
+          if [ "$(id -u)" -eq 0 ]; then
+            make test
+          else
+            sudo -n env PICORUBY_DIR="$PWD/../picoruby" make test
+          fi

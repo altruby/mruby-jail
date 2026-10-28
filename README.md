@@ -1,10 +1,10 @@
 <p align="center">
-  <a href="http://git.home.network/altruby/mruby-jail">
-    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi39c9ab6rTHulzqrvy45M_omMN8cUyRxfaAph0UhlpubhMxgnJVyOEarYGmHNZgt1uUZmO8cobmrloSiAfxUjgjNOVvRZrF9n9b5tO0S-sG7e9DHfalqyYQZm6aY1jV55IzPbGPA/s1600/freebsd_jail.png" width="200" height="200" border="0" alt="mruby-jail">
+  <a href="http://git.home.network/altruby/picoruby-jail">
+    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi39c9ab6rTHulzqrvy45M_omMN8cUyRxfaAph0UhlpubhMxgnJVyOEarYGmHNZgt1uUZmO8cobmrloSiAfxUjgjNOVvRZrF9n9b5tO0S-sG7e9DHfalqyYQZm6aY1jV55IzPbGPA/s1600/freebsd_jail.png" width="200" height="200" border="0" alt="picoruby-jail">
   </a>
 </p>
 <p align="center">
-  <a href="http://git.home.network/altruby/mruby-jail">
+  <a href="http://git.home.network/altruby/picoruby-jail">
     <img src="https://img.shields.io/badge/FreeBSD-Jails-blue.svg" alt="FreeBSD Jails">
   </a>
   <a href="https://opensource.org/license/mit">
@@ -14,14 +14,54 @@
 
 ## About
 
-mruby-jail provides mruby bindings for
-[`libjail`](https://man.freebsd.org/cgi/man.cgi?query=jail&apropos=0&sektion=3).
-The library provides an object-oriented interface for creating
-and removing jails, reading and writing jail parameters,
-enumerating running jails, finding jails by name or JID,
-and attaching the current process to a jail. Similar in
-approach to FreeBSD's lua bindings for jail management,
-but exposed through mruby.
+[picoruby](https://picoruby.org/) + libjail = picoruby-jail.
+
+This project combines an implementation of ruby that can run 
+on a single-chip microcontroller and [libjail](https://man.freebsd.org/libjail)
+from the FreeBSD project. Although [picoruby](https://picoruby.org/)
+markets itself towards embedded devices it also happens to run
+exceptionally well on POSIX systems too. It is more or less 
+straight forward to embed picoruby's bytecode into a C program.
+
+## Install
+
+##### make
+
+The next few lines will build your own copy 
+of the picoruby executable. The executable
+is linked against picoruby-jail and when it
+is run it automatically has access to the
+picoruby-jail classes, modules and methods. 
+This can be surprising compared to mainline
+CRuby where there is a single copy of the 
+executable that is built once on install: 
+
+    $ git clone --recurse-submodules https://github.com/picoruby/picoruby picoruby
+    $ git clone https://github.com/altruby/picoruby-jail
+    $ cd picoruby-jail
+    $ make build
+    $ ../picoruby/build/picoruby-jail/bin/picoruby -e 'p Jail.all'
+
+##### build_config.rb
+
+The steps:
+
+```sh
+mkdir myapp
+touch build_config.rb
+cd ../picoruby
+MRUBY_CONFIG=../myapp/build_config.rb rake
+```
+
+The configuration (`build_config.rb`):
+
+```ruby
+MRuby::Build.new("app") do |conf|
+  conf.toolchain
+  conf.gembox "default"
+  conf.gem github: "altruby/picoruby-jail", branch: "main"
+end
+```
 
 ## Quick start
 
@@ -176,16 +216,6 @@ operation that kills all processes in the jail:
 ```ruby
 jail = Jail.find_by(name: "example")
 jail.remove
-```
-
-## Build
-
-```ruby
-MRuby::Build.new("app") do |conf|
-  conf.toolchain
-  conf.gembox "default"
-  conf.gem github: "altruby/mruby-jail", branch: "main"
-end
 ```
 
 ## License

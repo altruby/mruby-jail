@@ -301,7 +301,7 @@ mrb_jail_parameters(mrb_state *mrb, mrb_value self)
 }
 
 void
-mrb_mruby_jail_gem_init(mrb_state *mrb)
+mrb_picoruby_jail_gem_init(mrb_state *mrb)
 {
   struct RClass *jail_cls;
 
@@ -319,7 +319,7 @@ mrb_mruby_jail_gem_init(mrb_state *mrb)
 }
 
 void
-mrb_mruby_jail_gem_final(mrb_state *mrb)
+mrb_picoruby_jail_gem_final(mrb_state *mrb)
 {
   (void)mrb;
 }

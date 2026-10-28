@@ -8,13 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  ##
-  # mruby is pinned to the commit that build.rb.lock records. Do not
-  # float on mruby's default branch: it ships a core "mruby-process"
-  # gem that shadows 0x1eef/mruby-process, which drops Process.euid,
-  # and Process.euid is what Jail::Test.root? uses to decide whether
-  # the specs can run
-  MRUBY_REF: 1f3f28bfb0d974238d64aa2652e064786dff5ec7
+  PICORUBY_REF: bcce62cb3bc04818d9a511cc67b663c4e6e5c867
 
 jobs:
   freebsd:
@@ -25,14 +19,15 @@ jobs:
     - name: checkout code
       uses: actions/checkout@v4
       with:
-        path: mruby-jail
+        path: picoruby-jail
 
-    - name: checkout mruby
+    - name: checkout picoruby
       uses: actions/checkout@v4
       with:
-        repository: mruby/mruby
-        ref: ${{ env.MRUBY_REF }}
-        path: mruby
+        repository: picoruby/picoruby
+        ref: ${{ env.PICORUBY_REF }}
+        path: picoruby
+        submodules: recursive
 
     - name: Build and test
       uses: vmactions/freebsd-vm@v1
@@ -42,33 +37,22 @@ jobs:
         run: |
           set -e
 
-          ##
-          # Install what the base system does not already provide.
-          # mruby's minirake is a thin wrapper around rake
           command -v git >/dev/null 2>&1 || pkg-static install -y git
           command -v ruby >/dev/null 2>&1 || pkg-static install -y ruby
           command -v rake >/dev/null 2>&1 || pkg-static install -y rubygem-rake
 
-          ##
-          # The workspace is owned by the runner user, but the commands
-          # below run as root inside the VM
-          git config --global --add safe.directory "$GITHUB_WORKSPACE/mruby"
-          git config --global --add safe.directory "$GITHUB_WORKSPACE/mruby-jail"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE/picoruby"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE/picoruby-jail"
 
           uname -a
           id
           ruby -v
           git --version
 
-          ##
-          # The specs create and remove jails, so they only run as root
           if [ "$(id -u)" -ne 0 ]; then
-            echo "error: the jail specs must run as root" >&2
+            echo "error: the jail tests must run as root" >&2
             exit 1
           fi
 
-          cd "$GITHUB_WORKSPACE/mruby-jail"
-          make MRUBY_DIR="$GITHUB_WORKSPACE/mruby" toolchain
-          bin/mruby -e 'p Jail::VERSION'
-          bin/mruby -e 'p Process.euid'
-          make MRUBY_DIR="$GITHUB_WORKSPACE/mruby" test
+          cd "$GITHUB_WORKSPACE/picoruby-jail"
+          make
