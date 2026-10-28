@@ -1,15 +1,10 @@
 <p align="center">
-  <a href="http://git.home.network/altruby/picoruby-jail">
-    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi39c9ab6rTHulzqrvy45M_omMN8cUyRxfaAph0UhlpubhMxgnJVyOEarYGmHNZgt1uUZmO8cobmrloSiAfxUjgjNOVvRZrF9n9b5tO0S-sG7e9DHfalqyYQZm6aY1jV55IzPbGPA/s1600/freebsd_jail.png" width="200" height="200" border="0" alt="picoruby-jail">
+  <a href="https://github.com/altruby/picoruby-jail">
+    <img src="daemon.png" width="200" height="200" border="0" alt="picoruby-jail">
   </a>
 </p>
 <p align="center">
-  <a href="http://git.home.network/altruby/picoruby-jail">
-    <img src="https://img.shields.io/badge/FreeBSD-Jails-blue.svg" alt="FreeBSD Jails">
-  </a>
-  <a href="https://opensource.org/license/mit">
-    <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
-  </a>
+  <strong>picoruby-jail</strong>
 </p>
 
 ## About
